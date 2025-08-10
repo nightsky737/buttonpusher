@@ -3,7 +3,8 @@ import socket
 import json
 from queue import Queue
 message_queue = Queue()
-
+pygame.font.init()
+font = pygame.font.SysFont("Arial", 24)
 
 pygame.init()
 screen = pygame.display.set_mode((400, 300))
@@ -47,32 +48,62 @@ def listen_to_server(sock):
 listener_thread = threading.Thread(target=listen_to_server, args=(client_socket,), daemon=True)
 listener_thread.start()
 
-
+holding_num = None
 running = True
+to_win = None
+won = False
 while running:
+    while not message_queue.empty():
+        message = message_queue.get()
+        #in format {"event_type": , "rect_num": , "clicked"}
+        # message = json.loads(message)
+        if message["event_type"] == "rect":
+            clicked[message["rect_num"]] = message["clicked"]
+            # print(clicked)
+        elif message["event_type"] == "win":
+            won = True
+        elif message["event_type"] == "setup":
+            to_win = message["need_press"]
+        message = None
     for event in pygame.event.get():
-        while not message_queue.empty():
-            message = message_queue.get()
-            #in format {"event_type": , "rect_num": , "clicked"}
-            # message = json.loads(message)
-            print(type(message))
-            if message["event_type"] == "rect":
-                clicked[message["rect_num"]] = message["clicked"]
-                # print(clicked)
-            message = None
+
         if event.type == pygame.QUIT:
             running = False
+            
         elif event.type == pygame.MOUSEBUTTONDOWN:
             pos = event.pos
             for i, rect in enumerate(board):
-                if rect.collidepoint(pos):
+                if rect.collidepoint(pos) and holding_num == None:
+                    print(f"holding {i}")
+                    holding_num = i
                     message = json.dumps({'event_type': "rect", "rect_num": i, "clicked" : True})
                     client_socket.sendall(message.encode())
 
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if holding_num != None:
+                print("Released hold!")
+                message = json.dumps({'event_type': "rect", "rect_num": holding_num, "clicked" : False})
+                client_socket.sendall(message.encode())
+                holding_num = None
+                
     screen.fill((30, 30, 30))
     for rect_num in range(len(board)):
         pygame.draw.rect(screen,  (0, 0, 0) if clicked[rect_num] else (0, 128, 255), board[rect_num])
+        text_surface = font.render(str(rect_num), True, (255, 255, 255))  # white text
+        text_rect = text_surface.get_rect(center=board[rect_num].center)
+        screen.blit(text_surface, text_rect)
+
+    text_surface = font.render(str(to_win), True, (255, 255, 255))  # white text
+    text_rect = text_surface.get_rect(center=(400, 50))
+    screen.blit(text_surface, text_rect)
+
+    if won:
+        text_surface = font.render("You've won!", True, (255, 255, 255))  # white text
+        text_rect = text_surface.get_rect(center=(400, 100))
+        screen.blit(text_surface, text_rect)
+
     pygame.display.flip()
+
 
 pygame.quit()
 client_socket.close()

@@ -19,7 +19,7 @@ def broadcast(message_dict):
 clients = []
 clicked = [False for i in range(16)]
 needs_clicked = []
-for i in range(4):
+for i in range(3):
     needs_clicked.append(random.randint(0, 15))
 print(f"click {needs_clicked}")
 
@@ -27,20 +27,37 @@ print(f"click {needs_clicked}")
 def handle_client(conn, addr):
     print(f"New connection from {addr}")
     with conn:
+        #sends the initial stuff
+        initial_stuff ={"event_type" : "setup", "need_press" : needs_clicked}
+        message = (json.dumps(initial_stuff) + '\n').encode()
+        conn.sendall(message)
+        
         while True:
-            data = conn.recv(1024)
-            if not data:
-                break
-            print(clients)
-            message = json.loads(data.decode())
-            #in format {"event_type": , "rect_num": , "clicked"}
+            try:
+                data = conn.recv(1024)
+                if not data:
+                    break
+                # print(clients)
+                message = json.loads(data.decode())
+                #in format {"event_type": , "rect_num": , "clicked"}
 
-            if message["event_type"] == "rect":
-                clicked[message["rect_num"]] = message["clicked"]
+                if message["event_type"] == "rect":
+                    clicked[message["rect_num"]] = message["clicked"]
 
-            print(f"Received from client: {message}")
-
-            broadcast(message)
+                broadcast(message)
+                #checks for win condition
+                all_clicked = True
+                for idx in needs_clicked:
+                    if(not clicked[idx]):
+                        all_clicked = False
+                if all_clicked:
+                    end ={"event_type" : "win"}
+                    broadcast(end)
+            except:
+                conn.close()
+    
+            
+            
 
 
 def main():
@@ -58,14 +75,7 @@ def main():
         client_thread = threading.Thread(target=handle_client, args=(conn, addr), daemon=True)
         client_thread.start()
 
-        #checks for win condition
-        all_clicked = True
-        for idx in needs_clicked:
-            if(not clicked[idx]):
-                all_clicked = False
-        if all_clicked:
-            print("yay you won")
-        
+
 
 if __name__ == "__main__":
     main()
