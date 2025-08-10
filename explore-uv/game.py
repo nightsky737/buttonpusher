@@ -9,8 +9,8 @@ font = pygame.font.SysFont("Arial", 24)
 
 pygame.init()
 screen = pygame.display.set_mode((400, 300))
-# SERVER_IP = '37.27.51.34' #http://37.27.51.34:65432/
-SERVER_IP = '127.0.0.1' #http://37.27.51.34:65432/
+SERVER_IP = '37.27.51.34' #http://37.27.51.34:65432/
+# SERVER_IP = '127.0.0.1' #http://37.27.51.34:65432/
 
 SERVER_PORT = 65432
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -57,7 +57,7 @@ to_win = None
 won = False
 
 restart_button = pygame.draw.rect(screen, (100, 40, 105), 
-        pygame.Rect(450, 200, 100, 60)) #x, y, width height
+        pygame.Rect(440, 200, 100, 60)) #x, y, width height
 
 time_A = 0
 
@@ -115,7 +115,7 @@ while running:
         screen.blit(text_surface, text_rect)
 
     text_surface = font.render(str(to_win), True, (255, 255, 255))  # white text
-    text_rect = text_surface.get_rect(center=(410, 50))
+    text_rect = text_surface.get_rect(center=(500, 50))
     screen.blit(text_surface, text_rect)
     
     pygame.draw.rect(screen, (100, 100, 105), restart_button)
@@ -123,19 +123,23 @@ while running:
     text_rect = text_surface.get_rect(center=restart_button.center)
     screen.blit(text_surface, text_rect)
 
-    time_left = max(0,15 - (time.time() - time_A))
+    time_left = max(0,5 - (time.time() - time_A))
     formatted_time = f"Time left {time_left:.1f}"
     text_surface = font.render(str(formatted_time), True, (255, 255, 255))  # white text
-    text_rect = text_surface.get_rect(center=(410, 100))
+    text_rect = text_surface.get_rect(center=(500, 100))
     screen.blit(text_surface, text_rect)
 
+
+    text_surface = font.render("Click all these simultaneously!", True, (255, 255, 255))  # white text
+    text_rect = text_surface.get_rect(center=(500, 10))
+    screen.blit(text_surface, text_rect)
     if time_left == 0 and not won:
         text_surface = font.render("You lose, times up!", True, (255, 255, 255))  # white text
-        text_rect = text_surface.get_rect(center=(400, 100))
+        text_rect = text_surface.get_rect(center=(500, 150))
         screen.blit(text_surface, text_rect)
     if won:
         text_surface = font.render("You've won!", True, (255, 255, 255))  # white text
-        text_rect = text_surface.get_rect(center=(410, 150))
+        text_rect = text_surface.get_rect(center=(500, 150))
         screen.blit(text_surface, text_rect)
 
     pygame.display.flip()
