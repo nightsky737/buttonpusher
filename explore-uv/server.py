@@ -15,7 +15,6 @@ def broadcast(message_dict):
             print("Failed to send to a client:", e)
             clients.remove(client_conn)
 
-
 clients = []
 clicked = [False for i in range(16)]
 needs_clicked = []
@@ -55,10 +54,6 @@ def handle_client(conn, addr):
                     broadcast(end)
             except:
                 conn.close()
-    
-            
-            
-
 
 def main():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
