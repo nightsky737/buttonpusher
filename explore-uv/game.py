@@ -1,6 +1,7 @@
 import pygame
 import socket
 import json
+import time
 from queue import Queue
 message_queue = Queue()
 pygame.font.init()
@@ -58,6 +59,7 @@ won = False
 restart_button = pygame.draw.rect(screen, (100, 40, 105), 
         pygame.Rect(450, 200, 60, 60)) #x, y, width height
 
+time_A = 0
 
 while running:
     while not message_queue.empty():
@@ -71,6 +73,8 @@ while running:
             won = True
         elif message["event_type"] == "setup":
             to_win = message["need_press"]
+            time_A = time.time()
+
         message = None
     for event in pygame.event.get():
 
@@ -107,6 +111,13 @@ while running:
     text_rect = text_surface.get_rect(center=(400, 50))
     screen.blit(text_surface, text_rect)
     pygame.draw.rect(screen, (100, 100, 105), restart_button)
+
+    time_left = max(0,15 - (time.time() - time_A))
+    formatted_time = f"{time_left:.1f}"
+    text_surface = font.render(str(formatted_time), True, (255, 255, 255))  # white text
+    text_rect = text_surface.get_rect(center=(400, 100))
+    screen.blit(text_surface, text_rect)
+
     if won:
         text_surface = font.render("You've won!", True, (255, 255, 255))  # white text
         text_rect = text_surface.get_rect(center=(400, 100))
