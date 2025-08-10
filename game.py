@@ -1,6 +1,9 @@
 import pygame
 import socket
 import json
+from queue import Queue
+message_queue = Queue()
+
 
 pygame.init()
 screen = pygame.display.set_mode((400, 300))
@@ -24,12 +27,9 @@ for r in range(board_size):
 
 import threading
 import json
-message = None
 
 def listen_to_server(sock):
     sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-
-    global message
 
     buffer = ""
     while True:
@@ -39,7 +39,8 @@ def listen_to_server(sock):
         buffer += data
         while '\n' in buffer:
             line, buffer = buffer.split('\n', 1)
-            message = line
+            message_queue.put(json.loads(line))
+
 
 
 # Then start it with:
@@ -50,14 +51,14 @@ listener_thread.start()
 running = True
 while running:
     for event in pygame.event.get():
-        print(message)
-        if message != None:
+        while not message_queue.empty():
+            message = message_queue.get()
             #in format {"event_type": , "rect_num": , "clicked"}
-            message = json.loads(message)
+            # message = json.loads(message)
             print(type(message))
             if message["event_type"] == "rect":
                 clicked[message["rect_num"]] = message["clicked"]
-                print(clicked)
+                # print(clicked)
             message = None
         if event.type == pygame.QUIT:
             running = False
