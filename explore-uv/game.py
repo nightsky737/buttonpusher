@@ -8,7 +8,9 @@ font = pygame.font.SysFont("Arial", 24)
 
 pygame.init()
 screen = pygame.display.set_mode((400, 300))
-SERVER_IP = '37.27.51.34' #http://37.27.51.34:65432/
+# SERVER_IP = '37.27.51.34' #http://37.27.51.34:65432/
+SERVER_IP = '127.0.0.1' #http://37.27.51.34:65432/
+
 SERVER_PORT = 65432
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((SERVER_IP, SERVER_PORT))
@@ -52,6 +54,11 @@ holding_num = None
 running = True
 to_win = None
 won = False
+
+restart_button = pygame.draw.rect(screen, (100, 40, 105), 
+        pygame.Rect(450, 200, 60, 60)) #x, y, width height
+
+
 while running:
     while not message_queue.empty():
         message = message_queue.get()
@@ -78,6 +85,9 @@ while running:
                     holding_num = i
                     message = json.dumps({'event_type': "rect", "rect_num": i, "clicked" : True})
                     client_socket.sendall(message.encode())
+            if restart_button.collidepoint(pos):
+                message = json.dumps({'event_type': "restart"})
+                client_socket.sendall(message.encode())
 
         elif event.type == pygame.MOUSEBUTTONUP:
             if holding_num != None:
@@ -96,14 +106,14 @@ while running:
     text_surface = font.render(str(to_win), True, (255, 255, 255))  # white text
     text_rect = text_surface.get_rect(center=(400, 50))
     screen.blit(text_surface, text_rect)
-
+    pygame.draw.rect(screen, (100, 100, 105), restart_button)
     if won:
         text_surface = font.render("You've won!", True, (255, 255, 255))  # white text
         text_rect = text_surface.get_rect(center=(400, 100))
         screen.blit(text_surface, text_rect)
 
-    pygame.display.flip()
 
+    pygame.display.flip()
 
 pygame.quit()
 client_socket.close()

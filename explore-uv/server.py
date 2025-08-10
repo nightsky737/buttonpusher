@@ -3,7 +3,7 @@ import json
 import threading
 import random
 
-HOST = '37.27.51.34'
+HOST ='127.0.0.1' #'37.27.51.34'
 PORT = 65432
 
 def broadcast(message_dict):
@@ -25,6 +25,7 @@ print(f"click {needs_clicked}")
 
 
 def handle_client(conn, addr):
+    global needs_clicked, clicked
     print(f"New connection from {addr}")
     with conn:
         #sends the initial stuff
@@ -44,6 +45,7 @@ def handle_client(conn, addr):
                 if message["event_type"] == "rect":
                     clicked[message["rect_num"]] = message["clicked"]
 
+                    
                 broadcast(message)
                 #checks for win condition
                 all_clicked = True
@@ -53,6 +55,13 @@ def handle_client(conn, addr):
                 if all_clicked:
                     end ={"event_type" : "win"}
                     broadcast(end)
+                if message["event_type"] == "restart":
+                    needs_clicked = []
+                    for i in range(3):
+                        needs_clicked.append(random.randint(0, 15))
+                    print(f"click {needs_clicked}")
+                    initial_stuff ={"event_type" : "setup", "need_press" : needs_clicked}
+                    broadcast(initial_stuff)
             except:
                 conn.close()
     
