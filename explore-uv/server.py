@@ -18,13 +18,14 @@ def broadcast(message_dict):
 clients = []
 clicked = [False for i in range(16)]
 needs_clicked = []
-for i in range(3):
+for i in range(0):
     needs_clicked.append(random.randint(0, 15))
 print(f"click {needs_clicked}")
 
+num_players = 3
 
 def handle_client(conn, addr):
-    global needs_clicked, clicked
+    global needs_clicked, num_players
     print(f"New connection from {addr}")
     with conn:
         #sends the initial stuff
@@ -44,6 +45,8 @@ def handle_client(conn, addr):
                 if message["event_type"] == "rect":
                     clicked[message["rect_num"]] = message["clicked"]
 
+                if message["event_type"] == "change_num_players":
+                    num_players = int(message['num_players'])
                     
                 broadcast(message)
                 #checks for win condition
@@ -56,7 +59,7 @@ def handle_client(conn, addr):
                     broadcast(end)
                 if message["event_type"] == "restart":
                     needs_clicked = []
-                    for i in range(3):
+                    for i in range(num_players):
                         needs_clicked.append(random.randint(0, 15))
                     print(f"click {needs_clicked}")
                     initial_stuff ={"event_type" : "setup", "need_press" : needs_clicked}

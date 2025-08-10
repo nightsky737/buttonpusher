@@ -91,7 +91,14 @@ while running:
                     client_socket.sendall(message.encode())
             if restart_button.collidepoint(pos):
                 message = json.dumps({'event_type': "restart"})
+                won = False
                 client_socket.sendall(message.encode())
+
+        if event.type == pygame.KEYDOWN:
+            if event.unicode.isdigit():
+                message = json.dumps({'event_type': "change_num_players", "num_players" : event.unicode})
+                client_socket.sendall(message.encode())
+            
 
         elif event.type == pygame.MOUSEBUTTONUP:
             if holding_num != None:
@@ -102,7 +109,7 @@ while running:
                 
     screen.fill((30, 30, 30))
     for rect_num in range(len(board)):
-        pygame.draw.rect(screen,  (0, 0, 0) if clicked[rect_num] else (0, 128, 255), board[rect_num])
+        pygame.draw.rect(screen,  (0, 0, 0) if clicked[rect_num] else (0, 200, 255), board[rect_num])
         text_surface = font.render(str(rect_num), True, (255, 255, 255))  # white text
         text_rect = text_surface.get_rect(center=board[rect_num].center)
         screen.blit(text_surface, text_rect)
@@ -128,9 +135,8 @@ while running:
         screen.blit(text_surface, text_rect)
     if won:
         text_surface = font.render("You've won!", True, (255, 255, 255))  # white text
-        text_rect = text_surface.get_rect(center=(410, 100))
+        text_rect = text_surface.get_rect(center=(410, 150))
         screen.blit(text_surface, text_rect)
-
 
     pygame.display.flip()
 
