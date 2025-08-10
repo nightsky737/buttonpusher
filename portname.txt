@@ -1,0 +1,7 @@
+E464F407431A4623
+
+2e7a:0005
+
+mpremote connect usb:2e7a:0005 repl
+
+ctrl + ] exits the micropython 
