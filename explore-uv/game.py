@@ -131,7 +131,6 @@ while running:
         text_rect = text_surface.get_rect(center=(410, 100))
         screen.blit(text_surface, text_rect)
 
-
     pygame.display.flip()
 
 pygame.quit()
