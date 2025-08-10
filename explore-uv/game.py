@@ -118,6 +118,10 @@ while running:
     text_rect = text_surface.get_rect(center=(400, 100))
     screen.blit(text_surface, text_rect)
 
+    if time_left == 0 and not won:
+        text_surface = font.render("You lose, times up!", True, (255, 255, 255))  # white text
+        text_rect = text_surface.get_rect(center=(400, 100))
+        screen.blit(text_surface, text_rect)
     if won:
         text_surface = font.render("You've won!", True, (255, 255, 255))  # white text
         text_rect = text_surface.get_rect(center=(400, 100))
