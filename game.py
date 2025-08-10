@@ -8,7 +8,7 @@ font = pygame.font.SysFont("Arial", 24)
 
 pygame.init()
 screen = pygame.display.set_mode((400, 300))
-SERVER_IP = '127.0.0.1'
+SERVER_IP = '37.27.51.34' #http://37.27.51.34:65432/
 SERVER_PORT = 65432
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((SERVER_IP, SERVER_PORT))

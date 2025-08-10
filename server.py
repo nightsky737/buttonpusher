@@ -3,7 +3,7 @@ import json
 import threading
 import random
 
-HOST = '127.0.0.1'
+HOST = '37.27.51.34'
 PORT = 65432
 
 def broadcast(message_dict):
